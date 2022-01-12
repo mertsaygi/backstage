@@ -87,6 +87,7 @@ import { connectEntityProviders } from '../processing/connectEntityProviders';
 import { permissionRules as catalogPermissionRules } from '../permissions/rules';
 import { PermissionAuthorizer } from '@backstage/plugin-permission-common';
 import { PermissionRule } from '@backstage/plugin-permission-node';
+import { AuthorizedLocationService } from './AuthorizedLocationService';
 
 export type CatalogEnvironment = {
   logger: Logger;
@@ -408,9 +409,9 @@ export class NextCatalogBuilder {
     const locationsCatalog = new DatabaseLocationsCatalog(db);
     const locationAnalyzer =
       this.locationAnalyzer ?? new RepoLocationAnalyzer(logger, integrations);
-    const locationService = new DefaultLocationService(
-      locationStore,
-      orchestrator,
+    const locationService = new AuthorizedLocationService(
+      new DefaultLocationService(locationStore, orchestrator),
+      permissions,
     );
     const refreshService = new AuthorizedRefreshService(
       new DefaultRefreshService({ database: processingDatabase }),
